@@ -9,72 +9,86 @@
 </head>
 <body>
 </body>
-  <div class="screen-container">
-    <div class="left-side">
-      <div class="sidebar">
-        <div class="sidebar-top">
-          <div class="profile-container">
-            <div class="profile-image">P</div>
-            <div class="username">Panagiotis Xenos</div>
-          </div>
-          <img src="./icons/sidebar.svg" alt="hide-sidebar" class="sidebar-icon">
-        </div>
-        <ul class="sidebar-main">
-          <li class="sidebar-element">
-            <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
-            <div>Add Task</div>
-          </li>
-          <li class="sidebar-element">
-            <img src="./icons/category.svg" alt="categories-icon" class="sidebar-icon">
-            <div>Categories</div>
-          </li>
-          <li class="sidebar-element">
-            <img src="./icons/upcoming.svg" alt="upcoming-icon" class="sidebar-icon">
-            <div>Upcoming</div>
-          </li>
-          <li class="sidebar-element">
-            <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
-            <div>Sort</div>
-          </li>
-          <li class="sidebar-element">
-            <img src="./icons/trash-bin.svg" alt="competed-tasks-icon" class="sidebar-icon">
-            <div>Completed</div>
-          </li>
-        </ul>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="profile-container hover-effect">
+        <div class="profile-image">P</div>
+        <div class="username">Panagiotis Xenos</div>
       </div>
     </div>
-    <div class="right-side">
-      <header class="header">
-        <div class="header-container">
-          <h1 class="title">My To-Do List</h1>
-          <div class="view-container">
-            <img src="" alt="" class="view-icon">
-            <div class="view-text">View</div>
-          </div>
-        </div>
-      </header>
-      <main class="main-screen">
-        <div class="to-do-container">
-          <div class="to-do-left-side">
-            <input type="checkbox">
-          </div>
-          <div class="to-do-right-side">
-            <h3 class="to-do-title">To-Do Title</h3>
-            <p class="to-do-description"></p>
-            <div class="button-container">
-              <button></button>
-              <button></button>
-              <button></button>
-            </div>
-          </div>
-        
-        </div>
-        <div class="add-new-to-do-container">
-          <img src="" alt="" class="">
+    <nav>
+      <ul class="sidebar-main">
+        <li class="sidebar-element hover-effect">
+          <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
           <div>Add Task</div>
+        </li>
+        <li class="sidebar-element hover-effect">
+          <img src="./icons/category.svg" alt="categories-icon" class="sidebar-icon">
+          <div>Categories</div>
+        </li>
+        <li class="sidebar-element hover-effect">
+          <img src="./icons/upcoming.svg" alt="upcoming-icon" class="sidebar-icon">
+          <div>Upcoming</div>
+        </li>
+        <li class="sidebar-element hover-effect">
+          <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
+          <div>Sort</div>
+        </li>
+        <li class="sidebar-element hover-effect">
+          <img src="./icons/trash-bin.svg" alt="competed-tasks-icon" class="sidebar-icon">
+          <div>Completed</div>
+        </li>
+      </ul>
+    </nav>
+    
+  </div>
+  <div class="right-side" id="right-side">
+    <header class="header">
+      <button class="hide-sidebar- hover-effect" id="hide-sidebar-button">
+        <img src="./icons/sidebar.svg" alt="hide-sidebar" class="sidebar-icon">
+      </button>
+      <h1 class="title">My To-Do List</h1>
+      <div class="view-container hover-effect">
+        <img src="./icons/view-icon.svg" alt="change-view" class="view-icon">
+        <div class="view-text">View</div>
+      </div>
+    </header>
+    <main class="main-screen">
+      <h2 class="page-title">Upcoming</h2>
+      <div class="to-do-container">
+        <div class="to-do-left-side">
+          <input type="checkbox">
         </div>
-      </main>
-    </div>
+        <div class="to-do-right-side">
+          <h3 class="to-do-title">To-Do Title</h3>
+          <p class="to-do-description">Go to the groceries store and buy patatos cucamber lemon and carrots</p>
+          <div class="button-container">
+
+            <button class="calendar-button hover-effect">
+              <!--<input type="date">-->
+              <img src="./icons/calendar.svg" alt="select-date-icon">
+              10 Apr
+              <img src="./icons/x.svg" alt="remove-date-bytton">
+            </button>
+
+            <select name="category" id="category" class="hover-effect">
+              <option value="select" class="select-category">Select category</option>
+            </select>
+
+            <button class="reminder-button hover-effect">
+              <img src="./icons/riminder.svg" alt="reminder-button">
+              Reminder
+              <img src="./icons/x.svg" alt="remove-reminder-button">
+            </button>
+          </div>
+        </div>
+      
+      </div>
+      <div class="add-new-to-do-container">
+        <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
+        <div>Add Task</div>
+      </div>
+    </main>
   </div>
 </body>
 </html>

@@ -53,6 +53,8 @@
         <div class="view-text">View</div>
       </div>
     </header>
+
+    <!--Main-->
     <main class="main-screen">
       <h2 class="page-title">Upcoming</h2>
       <div class="to-do-container">
@@ -65,10 +67,8 @@
           <div class="button-container">
 
             <button class="calendar-button hover-effect">
-              <!--<input type="date">-->
               <img src="./icons/calendar.svg" alt="select-date-icon">
               10 Apr
-              <img src="./icons/x.svg" alt="remove-date-bytton">
             </button>
 
             <select name="category" id="category" class="hover-effect">
@@ -78,13 +78,37 @@
             <button class="reminder-button hover-effect">
               <img src="./icons/riminder.svg" alt="reminder-button">
               Reminder
-              <img src="./icons/x.svg" alt="remove-reminder-button">
             </button>
           </div>
         </div>
       
       </div>
-      <div class="add-new-to-do-container">
+
+      <div id="new-todo-input-container" class="new-todo-input-container">
+        <input type="text" name="task-name" id="task-name" placeholder="Task name">
+        <input type="text" name="task-descreption" id="task-descreption" placeholder="Description">
+
+        <div class="button-container">
+
+          <input type="date" id="due-date-input" class="hover-effect">
+
+          <select name="category" id="category" class="hover-effect">
+            <option value="select" class="select-category">Select category</option>
+          </select>
+
+          <button class="reminder-button hover-effect">
+            <img src="./icons/riminder.svg" alt="reminder-button">
+            Reminder
+          </button>
+        </div>
+
+        <div class="save-cancel-button-container">
+          <button class="cancel-button hover-effect" id="cancel-button">Cancel</button>
+          <button class="save-task-button" id="save-task-button">Add Task</button>
+        </div>
+      </div>
+
+      <div class="add-new-to-do-container" id="add-task-button">
         <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
         <div>Add Task</div>
       </div>

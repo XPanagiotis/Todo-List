@@ -1,3 +1,16 @@
+let todos = [];
+
+document.getElementById('add-task-button').addEventListener('click', displayForm)
+
+
+function displayForm() {
+  //cashe DOM
+  let newTodoInput = document.getElementById('new-todo-input-container');
+
+  newTodoInput.style.display = 'flex';
+
+}
+
 //sidebar transition
 const openSidebarBtn = document.getElementById('hide-sidebar-button');
 let isSidebarOpen = true;
@@ -12,6 +25,4 @@ openSidebarBtn.addEventListener('click', () => {
     document.getElementById("right-side").style.marginLeft= "0";
     isSidebarOpen = !isSidebarOpen
   }
-})
-
-
+});

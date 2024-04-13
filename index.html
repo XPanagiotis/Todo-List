@@ -55,35 +55,12 @@
     </header>
 
     <!--Main-->
-    <main class="main-screen">
+    <main class="main-screen" id="main-screen">
       <h2 class="page-title">Upcoming</h2>
 
-      <!--<div class="to-do-container">
-        <div class="to-do-left-side">
-          <input type="checkbox">
-        </div>
-        <div class="to-do-right-side">
-          <h3 class="to-do-title">To-Do Title</h3>
-          <p class="to-do-description">Go to the groceries store and buy patatos cucamber lemon and carrots</p>
-          <div class="button-container">
-
-            <button class="calendar-button hover-effect">
-              <img src="./icons/calendar.svg" alt="select-date-icon">
-              10 Apr
-            </button>
-
-            <select name="category" id="category" class="hover-effect">
-              <option value="select" class="select-category">Select category</option>
-            </select>
-
-            <button class="reminder-button hover-effect">
-              <img src="./icons/riminder.svg" alt="reminder-button">
-              Reminder
-            </button>
-          </div>
-        </div>
-      
-      </div>-->
+      <div class="to-do-container" id="to-do-container">
+        <!--Dispalay todo cards-->
+      </div>
 
       <div id="new-todo-input-container" class="new-todo-input-container">
         <input type="text" name="task-name" id="task-name" placeholder="Task name">
@@ -91,7 +68,7 @@
 
         <div class="button-container">
 
-          <input type="date" id="due-date-input" class="hover-effect">
+          <input type="datetime-local" id="due-date-input" class="hover-effect">
 
           <select name="category" id="category" class="hover-effect">
             <option value="" class="select-category">Select category</option>

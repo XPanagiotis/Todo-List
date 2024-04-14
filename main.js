@@ -16,14 +16,14 @@ let events = {
       };
     }
   },
-    emit: function (eventName, data) {
-      if (this.events[eventName]) {
-        this.events[eventName].forEach(function(fn) {
-          fn(data);
-        });
-      }
+  emit: function (eventName, data) {
+    if (this.events[eventName]) {
+      this.events[eventName].forEach(function(fn) {
+        fn(data);
+      });
     }
-  };
+  }
+};
 
 //styling and animations
 const styles = (function(){
@@ -55,63 +55,67 @@ const styles = (function(){
 const todoController = (function() {
   //cashe DOM
   const openSidebarBtn = document.getElementById('hide-sidebar-button');
-  const addNewTodoBtn =  document.getElementById('save-task-button');
+
   const toDoContainer = document.getElementById('to-do-container');
   const newTodoInput = document.getElementById('new-todo-input-container');
+
+  const submitBtn =  document.getElementById('save-task-button');
+  const cancelBtn = document.getElementById('cancel-button');
+
+  //form
+  const title = document.getElementById('task-name');
+  const descreption = document.getElementById('task-descreption');
+  const dueDate = document.getElementById('due-date-input');
+  const category = document.getElementById('category');
 
   //bind events
   openSidebarBtn.addEventListener('click', styles.sidebarAnimation);
   document.getElementById('add-task-button').addEventListener('click', displayForm);
+  document.getElementById('side-bar-add-new-task').addEventListener('click', displayForm);
   events.on('renderTodos', renderTodos);
   events.on('displayTodo', displayToDos);
 
-  function displayForm() {
-    //cashe DOM
-    let titleInput = document.getElementById('task-name');
 
+
+  function displayForm(todo) {
     newTodoInput.style.display = 'flex';
 
     /*Bind events*/
-
+    cancelBtn.addEventListener('click', cancelForm);
     //check if user has input data
-    titleInput.addEventListener('keyup', () => {
-      if (titleInput.value == null || titleInput.value == "") {
-        addNewTodoBtn.style.opacity = "0.5";
-        addNewTodoBtn.style.cursor = 'not-allowed';
+    title.addEventListener('keyup', () => {
+      if (title.value == null || title.value == '') {
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.removeEventListener('click', addNewTodo);
       }
       else {
-        addNewTodoBtn.style.opacity = "1";
-        addNewTodoBtn.style.cursor = 'pointer';
+        submitBtn.style.opacity = "1";
+        submitBtn.style.cursor = 'pointer';
         //if user has input data we create a new to-do
-        addNewTodoBtn.addEventListener('click', addNewTodo);
+        submitBtn.addEventListener('click', addNewTodo);
       }
     })
-  
+
     //add new todo function
     function addNewTodo() {
-      
-      let title = document.getElementById('task-name');
-      let descreption = document.getElementById('task-descreption');
-      let dueDate = document.getElementById('due-date-input');
-      let category = document.getElementById('category');
-    
-      events.emit('create ToDo', [title.value, descreption.value, dueDate.value, category.value]);
-      
-      //clear form
-      (function clearForm() {
-        let title = document.getElementById('task-name');
-        title.value = '';
-        let descreption = document.getElementById('task-descreption');
-        descreption.value = '';
-        let dueDate = document.getElementById('due-date-input');
-        dueDate.value = '';
-        let category = document.getElementById('category');
-        category.value = '';
-      })()
+      if(title.value != '') {
+        events.emit('create ToDo', [title.value, descreption.value, dueDate.value, category.value]);        
+      }
+      //reset form
+      resetForm();
     }
 
-    //clear form
-    function clearForm() {
+    function cancelForm() {
+      newTodoInput.style.display = 'none';
+      resetForm();
+      cancelBtn.removeEventListener('click', cancelForm);
+    }
+
+    //reset form
+    function resetForm() {
+      submitBtn.removeEventListener('click', addNewTodo);
+
       let title = document.getElementById('task-name');
       title.value = '';
       let descreption = document.getElementById('task-descreption');
@@ -120,7 +124,64 @@ const todoController = (function() {
       dueDate.value = '';
       let category = document.getElementById('category');
       category.value = '';
+
+      submitBtn.style.opacity = "0.5";
+      submitBtn.style.cursor = 'not-allowed';
     }
+
+    return {
+      cancelForm,
+      resetForm
+    }
+  }
+
+  function addEditEL(todo, element) {
+    element.querySelector('.edit-button').addEventListener('click', () => {
+
+      let cards = document.querySelectorAll('.to-do-card')
+      cards.forEach(card => {
+        if(card.style.display == 'none') card.style.display = 'flex'
+      })
+      
+      element.style.display = 'none';
+      const form = element.insertAdjacentElement('afterend', newTodoInput);
+
+      title.value = todo.title;
+      descreption.value = todo.descreption;
+      dueDate.value = todo.dueDate;
+      category.value = todo.category;
+
+      submitBtn.style.opacity = "1";
+      submitBtn.style.cursor = 'pointer';
+
+      //Bind events
+      cancelBtn.addEventListener('click', cancelEdit);
+
+      function cancelEdit() {
+        element.style.display = 'flex';
+        form.remove()
+        displayForm().cancelForm;
+        cancelBtn.removeEventListener('click', cancelEdit);
+      }
+
+      title.addEventListener('keyup', () => {
+        if (title.value == null || title.value == '') {
+          submitBtn.style.opacity = '0.5';
+          submitBtn.style.cursor = 'not-allowed';
+          //submitBtn.removeEventListener('click', editTodo);
+        }
+        else {
+          submitBtn.style.opacity = "1";
+          submitBtn.style.cursor = 'pointer';
+          //if user has input data we create a new to-do
+          //submitBtn.addEventListener('click', editTodo);
+        }
+      });
+
+
+      //submitBtn.addEventListener('click', editTodo);
+      newTodoInput.style.display = 'flex';
+    })
   }
 
   function renderTodos(todos) {
@@ -128,11 +189,10 @@ const todoController = (function() {
     todos.forEach(todo => displayToDos(todo));
   }
 
-
   function displayToDos(todo) {
-    console.log(todo)
     const todoCard = document.createElement('div');
     todoCard.setAttribute('class', 'to-do-card');
+    todoCard.id = todo.id;
 
     //To-Do Left Side
     const todoLeftSide = document.createElement('div');
@@ -147,8 +207,11 @@ const todoController = (function() {
     todoRightSide.appendChild(createTodoElement('h3', todo.title, 'to-do-title'));
 
     //edit button
-    const editButton = todoRightSide.appendChild(createTodoElement('button', '', 'edit-button hover-effect'))
-    editButton.appendChild(createIcon('edit'));
+    const editButton = todoRightSide.appendChild(createIcon('edit'));
+    editButton.id = todo.id
+    
+    //attach event lister for each edit button
+    addEditEL(todo, todoCard);
     
     todoRightSide.appendChild(createTodoElement('p', todo.descreption, 'to-do-description'));
 
@@ -173,6 +236,9 @@ const todoController = (function() {
   
       dueDateBtn.appendChild(createIcon('due-date'));
     }
+
+    //category 
+    btnContainer.appendChild(createTodoElement('div', `Type: ${todo.category}`, 'to-do-category'))
 
     //insert Todo
     toDoContainer.insertAdjacentElement('afterbegin', todoCard);
@@ -204,7 +270,8 @@ const todoController = (function() {
         iconEl.src = './icons/calendar.svg';
         break;
       case 'edit':
-        iconEl.src = './icons/edit.svg'
+        iconEl.src = './icons/edit.svg';
+        iconEl.setAttribute('class', 'edit-button hover-effect')
         break;
      }
 

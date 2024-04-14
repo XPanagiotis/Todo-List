@@ -170,12 +170,14 @@ h2 {
   padding-bottom: 20px;
   box-shadow: 0 3px 2px -2px rgb(224, 224, 224);
 }
+
+/*To-Do Card*/
 .to-do-card {
   background-color: rgb(253, 253, 253);
   display: flex;
   position: relative;
   box-shadow: 0 3px 2px -2px rgb(224, 224, 224);
-  padding-bottom: 20px;
+  padding-bottom: 10px;
   margin-bottom: 3px;
 }
 .edit-button {
@@ -183,13 +185,15 @@ h2 {
   top: 0;
   right: 0;
 }
-
+.to-do-left-side {
+  margin-right: 10px;
+}
 .to-do-title {
   padding-top: 3px;
   text-wrap: wrap;
 }
 .to-do-description {
-  padding: 10px 0;
+  padding: 5px 0;
 }
 .add-new-to-do-container {
   display: flex;
@@ -218,17 +222,23 @@ h2 {
 .button-container > * {
   border: 1px solid rgb(224, 224, 224);
   border-radius: 8px;
+  font-size: 12px;
 }
 .button-container > button {
   display: flex;
-  align-items: center ;
+  align-items: center;
   text-wrap: nowrap;
 }
 .button-container > button > img {
-  height: 15px;
+  height: 14px;
   margin-left: 4px;
 }
 
+/*To-Do category*/
+.to-do-category {
+  font-size: 13px;
+  padding: 5px;
+}
 
 .new-todo-input-container {
   display: none;

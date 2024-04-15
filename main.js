@@ -62,6 +62,8 @@ const todoController = (function() {
   const submitBtn =  document.getElementById('save-task-button');
   const cancelBtn = document.getElementById('cancel-button');
 
+  const addNewTaskBtn = document.getElementById('add-task-button')
+
   //form
   const title = document.getElementById('task-name');
   const descreption = document.getElementById('task-descreption');
@@ -70,18 +72,29 @@ const todoController = (function() {
 
   //bind events
   openSidebarBtn.addEventListener('click', styles.sidebarAnimation);
-  document.getElementById('add-task-button').addEventListener('click', displayForm);
+  addNewTaskBtn.addEventListener('click', displayForm);
   document.getElementById('side-bar-add-new-task').addEventListener('click', displayForm);
   events.on('renderTodos', renderTodos);
   events.on('displayTodo', displayToDos);
 
 
 
-  function displayForm(todo) {
+  function displayForm() {
+    //if edit form is displayed we remove it and reset it
+    if (newTodoInput.style.display == 'flex') {
+      newTodoInput.style.display = 'none';
+      resetForm()
+      events.emit('showTask');
+    }
+    
+    //display the form
+    document.getElementById('add-task-button').insertAdjacentElement('beforebegin', newTodoInput);
     newTodoInput.style.display = 'flex';
+    submitBtn.textContent = 'Add Task';
 
     /*Bind events*/
     cancelBtn.addEventListener('click', cancelForm);
+
     //check if user has input data
     title.addEventListener('keyup', () => {
       if (title.value == null || title.value == '') {
@@ -116,13 +129,9 @@ const todoController = (function() {
     function resetForm() {
       submitBtn.removeEventListener('click', addNewTodo);
 
-      let title = document.getElementById('task-name');
       title.value = '';
-      let descreption = document.getElementById('task-descreption');
       descreption.value = '';
-      let dueDate = document.getElementById('due-date-input');
       dueDate.value = '';
-      let category = document.getElementById('category');
       category.value = '';
 
       submitBtn.style.opacity = "0.5";
@@ -137,32 +146,37 @@ const todoController = (function() {
 
   function addEditEL(todo, element) {
     element.querySelector('.edit-button').addEventListener('click', () => {
-
-      let cards = document.querySelectorAll('.to-do-card')
-      cards.forEach(card => {
-        if(card.style.display == 'none') card.style.display = 'flex'
+      events.on('showTask', () => {
+        element.style.display = 'flex';
       })
-      
-      element.style.display = 'none';
+
+      //display edit form
       const form = element.insertAdjacentElement('afterend', newTodoInput);
 
+      //if another edit button is clicked we display all the todos
+      let cards = document.querySelectorAll('.to-do-card');
+      cards.forEach(card => {
+        if(card.style.display == 'none') {
+          card.style.display = 'flex';
+        }
+      });
+
+      //hide the todo we want to edit
+      element.style.display = 'none';
+
+      //fill the edit form with the current todo data
       title.value = todo.title;
       descreption.value = todo.descreption;
       dueDate.value = todo.dueDate;
       category.value = todo.category;
 
+      //style the save button
       submitBtn.style.opacity = "1";
+      submitBtn.textContent = 'Save';
       submitBtn.style.cursor = 'pointer';
 
       //Bind events
       cancelBtn.addEventListener('click', cancelEdit);
-
-      function cancelEdit() {
-        element.style.display = 'flex';
-        form.remove()
-        displayForm().cancelForm;
-        cancelBtn.removeEventListener('click', cancelEdit);
-      }
 
       title.addEventListener('keyup', () => {
         if (title.value == null || title.value == '') {
@@ -174,10 +188,39 @@ const todoController = (function() {
           submitBtn.style.opacity = "1";
           submitBtn.style.cursor = 'pointer';
           //if user has input data we create a new to-do
-          //submitBtn.addEventListener('click', editTodo);
+          submitBtn.addEventListener('click', submitEdit);
         }
       });
 
+      //if the cancel button is clicked we remove and reset the form and remove the enevtListener
+      function cancelEdit() {
+        element.style.display = 'flex';
+
+        title.value = '';
+        descreption.value = '';
+        dueDate.value = '';
+        category.value = '';
+
+        submitBtn.style.opacity = "0.5";
+        submitBtn.style.cursor = 'not-allowed';
+
+        form.style.display = 'none';
+        cancelBtn.removeEventListener('click', cancelEdit);
+      }
+
+      //edit todo
+      function submitEdit() {
+        events.emit('submitEdit', [todo.id, title.value, descreption.value, dueDate.value, category.value]);
+        title.value = '';
+        descreption.value = '';
+        dueDate.value = '';
+        category.value = '';
+
+        submitBtn.style.opacity = "0.5";
+        submitBtn.style.cursor = 'not-allowed';
+
+        submitBtn.removeEventListener('click', submitEdit)
+      }
 
       //submitBtn.addEventListener('click', editTodo);
       newTodoInput.style.display = 'flex';
@@ -298,6 +341,7 @@ const toDosHandler = (function() {
 
   //bind events
   events.on('create ToDo', createToDo);
+  events.on('submitEdit', editTodo)
 
   //create a new todo
   function createToDo(data) {
@@ -314,6 +358,27 @@ const toDosHandler = (function() {
     saveTodo();
     events.emit('renderTodos', todos);
   }
+
+  //edit todo
+  function editTodo(data) {
+    let todoToEdit = todos.filter(todo => todo.id === data[0])[0];
+
+    let i = 1;
+    for (const key in todoToEdit) {
+      if (key === 'id')continue
+      if (todoToEdit[key] !== data[i] & data[i] !== '') {
+        todoToEdit[key] = data[i];
+      }
+      i++
+    }
+
+    for(let todo of todos) {
+      if(todo.id === todoToEdit.id) todo = todoToEdit
+    }
+    saveTodo();
+    events.emit('renderTodos', todos);
+  }
+
 
   //save todo in local storage
   function saveTodo() {

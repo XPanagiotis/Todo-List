@@ -257,7 +257,7 @@ h2 {
   padding: 5px;
 }
 
-.new-todo-input-container {
+.new-todo-input-container, .new-category-input-container {
   display: none;
   flex-direction: column;
   background-color: rgb(253, 253, 253);
@@ -288,4 +288,63 @@ h2 {
 }
 .save-task-button:hover {
   background-color: rgb(219, 67, 56);
+}
+
+/*Categories Screen*/
+.category-screen {
+  background-color: rgb(253, 253, 253);
+  min-height: fit-content;
+  max-height: max-content;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 3% 40%;
+}
+.category-screen > * {
+  width: 100%;
+}
+
+.category-card {
+  background-color: rgb(253, 253, 253);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 3px 2px -2px rgb(224, 224, 224);
+  padding-bottom: 10px;
+  margin-bottom: 3px;
+}
+
+.add-new-category {
+  display: flex;
+  width: fit-content;
+  align-self: flex-start;
+  margin-top: 10px;
+}
+.add-new-category > *:hover {
+  font-size: 18px;
+  color: var(--coral-color);
+  cursor: pointer;
+}
+.add-new-category > img {
+  margin-right: 8px;
+}
+.add-new-category > div {
+  color: rgb(143, 143, 143);
+}
+
+/*Categories Screen*/
+.sort-screen {
+  background-color: rgb(253, 253, 253);
+  min-height: fit-content;
+  max-height: max-content;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 3% 25%;
+}
+.sort-screen > * {
+  width: 100%;
 }

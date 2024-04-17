@@ -22,15 +22,15 @@
           <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
           <div>Add Task</div>
         </li>
-        <li class="sidebar-element hover-effect">
+        <li class="sidebar-element hover-effect" id="categories-button">
           <img src="./icons/category.svg" alt="categories-icon" class="sidebar-icon">
           <div>Categories</div>
         </li>
-        <li class="sidebar-element hover-effect">
+        <li class="sidebar-element hover-effect" id="upcoming-button">
           <img src="./icons/upcoming.svg" alt="upcoming-icon" class="sidebar-icon">
           <div>Upcoming</div>
         </li>
-        <li class="sidebar-element hover-effect">
+        <li class="sidebar-element hover-effect" id="sort-sidebar-button">
           <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
           <div>Sort</div>
         </li>
@@ -56,6 +56,7 @@
 
     <!--Main-->
     <main class="main-screen" id="main-screen">
+      <!--Upcoming Screen-->
       <h2 class="page-title">Upcoming</h2>
 
       <div class="to-do-container" id="to-do-container">
@@ -95,6 +96,27 @@
         <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
         <div>Add Task</div>
       </div>
+    </main>
+
+    <!--Categories Screen-->
+    <main class="category-screen" id="category-screen">
+      <h2 class="page-title">Categories</h2>
+
+      <div class="categories-container" id="categories-container">
+        <!--Categories To Be Displayed-->
+      </div>
+      
+      <div class="add-new-category" id="add-category-button">
+        <img src="./icons/plus-circle.svg" alt="add-category-icon" class="sidebar-icon">
+        <div>Add new category</div>
+      </div>
+    </main>
+
+    <!--Sort Todos Screen-->
+    <main class="sort-screen" id="sort-screen">
+      <h2 class="page-title">Sort</h2>
+
+      <div class="container"></div>
     </main>
   </div>
 </body>

@@ -258,7 +258,7 @@ h2 {
 }
 
 .new-todo-input-container, .new-category-input-container {
-  display: none;
+  display: flex;
   flex-direction: column;
   background-color: rgb(253, 253, 253);
   border: 1px solid rgb(156, 156, 156);
@@ -334,7 +334,7 @@ h2 {
   color: rgb(143, 143, 143);
 }
 
-/*Categories Screen*/
+/*Sort Screen*/
 .sort-screen {
   background-color: rgb(253, 253, 253);
   min-height: fit-content;

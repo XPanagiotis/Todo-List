@@ -70,22 +70,33 @@ const todoController = (function() {
   const toDoContainer = document.getElementById('to-do-container');
   const newTodoInput = document.getElementById('new-todo-input-container');
 
-  const submitBtn =  document.getElementById('save-task-button');
   const cancelBtn = document.getElementById('cancel-button');
 
   const addNewTaskBtn = document.getElementById('add-task-button');
 
-
   //form
-  const title = document.getElementById('task-name');
   const descreption = document.getElementById('task-descreption');
   const dueDate = document.getElementById('due-date-input');
   const category = document.getElementById('category');
 
   //bind events
   openSidebarBtn.addEventListener('click', styles.sidebarAnimation);
-  addNewTaskBtn.addEventListener('click', displayForm);
-  document.getElementById('side-bar-add-new-task').addEventListener('click', displayForm);
+
+  //add task buttons
+  addNewTaskBtn.addEventListener('click', () => {
+    if(document.getElementById('new-todo-input-container') == null) {
+      addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+    }
+  }, {once:true});
+
+  document.getElementById('side-bar-add-new-task').addEventListener('click', () => {
+    //if we are in another screen and add new task is clicked we show the Upcoming screen
+    if(mainScreen.style.display == 'none') events.emit('showUpcomingScreen');
+
+    if(document.getElementById('new-todo-input-container') == null) {
+      addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+    }
+  }, {once:true});
 
   events.on('showUpcomingScreen', showUpcomingScreen);
   events.on('renderTodos', renderTodos);
@@ -98,101 +109,147 @@ const todoController = (function() {
     mainScreen.style.display = 'flex';
   }
 
+  //Create new to-do Input Form
+  function createForm(type) {
 
+    const formContainer = document.createElement('div');
+    formContainer.setAttribute('class', 'new-todo-input-container');
+    formContainer.id = 'new-todo-input-container';
 
-  function displayForm() {
-    //if we are in another screen and add new task is clicked we show the upcoming screen
-    if(mainScreen.style.display == 'none') events.emit('showUpcomingScreen');
+    const title = createInput('text', 'task-name', 'Task name')
+    formContainer.appendChild(title);
 
-    //if edit form is displayed we remove it and reset it
-    if (newTodoInput.style.display == 'flex') {
-      newTodoInput.style.display = 'none';
-      resetForm()
-      events.emit('showTask');
-    }
+    const descreption = createInput('text', 'task-descreption', 'Descreption')
+    formContainer.appendChild(descreption);
+
+    const btnContainer = document.createElement('div');
+    btnContainer.setAttribute('class', 'button-container');
+
+    const dueDate = createInput('datetime-local', 'due-date-input')
+    btnContainer.appendChild(dueDate);
+
+    //Select Input
+    const selectInput = createTodoElement('select', '', 'hover-effect');
+    selectInput.id = 'category';
+
+    const option = document.createElement('option');
+    option.setAttribute('class', 'select-category');
+    option.setAttribute('value', 'default');
+    option.textContent = 'Select Category';
+
+    selectInput.appendChild(option);
+    btnContainer.appendChild(selectInput);
     
-    //display the form
-    document.getElementById('add-task-button').insertAdjacentElement('beforebegin', newTodoInput);
-    newTodoInput.style.display = 'flex';
-    submitBtn.textContent = 'Add Task';
+    const reminderBtn = createTodoElement('button', 'Reminder', 'reminder-button hover-effect');
+    reminderBtn.appendChild(createIcon('reminder'));
 
-    /*Bind events*/
-    cancelBtn.addEventListener('click', cancelForm);
+    btnContainer.appendChild(reminderBtn);
+    formContainer.appendChild(btnContainer)
 
-    //check if user has input data
-    title.addEventListener('keyup', () => {
-      if (title.value == null || title.value == '') {
-        submitBtn.style.opacity = '0.5';
-        submitBtn.style.cursor = 'not-allowed';
-        submitBtn.removeEventListener('click', addNewTodo);
-      }
-      else {
-        submitBtn.style.opacity = "1";
-        submitBtn.style.cursor = 'pointer';
-        //if user has input data we create a new to-do
-        submitBtn.addEventListener('click', addNewTodo);
-      }
-    })
+    const saveCancelBtnContainer = createTodoElement('div', '', 'save-cancel-button-container');
+    const cancelBtn = createTodoElement('button', 'Cancel', 'cancel-button hover-effect');
+    cancelBtn.id = 'cancel-button';
+    saveCancelBtnContainer.appendChild(cancelBtn)
+
+    const saveBtn = createTodoElement('button', 'Add', 'save-task-button');
+    saveBtn.id = 'save-task-button';
+    saveCancelBtnContainer.appendChild(saveBtn);
+    formContainer.appendChild(saveCancelBtnContainer);
+
+
+    //Bind Events
+
+    if(type == 'newTodo') {
+      //Cancel Button
+      cancelBtn.addEventListener('click', () => {
+        formContainer.remove();
+
+        addNewTaskBtn.addEventListener('click', () => {
+          if(document.getElementById('new-todo-input-container') == null) {
+            addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+          }
+        }, {once:true});
+
+        document.getElementById('side-bar-add-new-task').addEventListener('click', () => {
+          //if we are in another screen and add new task is clicked we show the Upcoming screen
+          if(mainScreen.style.display == 'none') events.emit('showUpcomingScreen');
+          
+          if(document.getElementById('new-todo-input-container') == null) {
+            addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+          }
+        }, {once:true});
+      });
+
+      //check if user has input data
+      title.addEventListener('keyup', () => {
+        if (title.value == null || title.value == '') {
+          saveBtn.style.opacity = '0.5';
+          saveBtn.style.cursor = 'not-allowed';
+          //saveBtn.removeEventListener('click', addNewTodo);
+        } else {
+          saveBtn.style.opacity = "1";
+          saveBtn.style.cursor = 'pointer';
+          //if user has input data we create a new to-do
+          saveBtn.addEventListener('click', addNewTodo);
+        }
+      })
+    }
 
     //add new todo function
     function addNewTodo() {
       if(title.value != '') {
-        events.emit('create ToDo', [title.value, descreption.value, dueDate.value, category.value]);        
+        events.emit('create ToDo', [title.value, descreption.value, dueDate.value, selectInput.value]);        
       }
       //reset form
       resetForm();
     }
 
-    function cancelForm() {
-      newTodoInput.style.display = 'none';
-      resetForm();
-      cancelBtn.removeEventListener('click', cancelForm);
+    //if edit form is displayed we remove it and reset it
+    if (document.getElementById('new-todo-input-container') != null) {
+      document.getElementById('new-todo-input-container').remove()
+      events.emit('showTask');
     }
 
     //reset form
     function resetForm() {
-      submitBtn.removeEventListener('click', addNewTodo);
-
+      //saveBtn.removeEventListener('click', addNewTodo);
+    
       title.value = '';
       descreption.value = '';
       dueDate.value = '';
-      category.value = '';
-
-      submitBtn.style.opacity = "0.5";
-      submitBtn.style.cursor = 'not-allowed';
+      selectInput.value = '';
+    
+      saveBtn.style.opacity = "0.5";
+      saveBtn.style.cursor = 'not-allowed';
     }
 
-    return {
-      cancelForm,
-      resetForm
-    }
+    return formContainer
   }
 
   function addEditEL(todo, element) {
-    element.querySelector('.edit-button').addEventListener('click', _edit)
+    
+    element.querySelector('.edit-button').addEventListener('click', edit)
 
 
-    function _edit() {
+    function edit() {
 
       events.on('showTask', () => {
         element.style.display = 'flex';
-      })
-
-
-
-      //if another edit button is clicked we display all the todos
-      let cards = document.querySelectorAll('.to-do-card');
-      cards.forEach(card => {
-        if(card.style.display == 'none') {
-          card.style.display = 'flex';
-
-        }
       });
+      
+      //cashe DOM
 
       //display edit form
-      const form = element.insertAdjacentElement('afterend', newTodoInput);
+      const form = createForm('edit');
+      element.insertAdjacentElement('afterend', form);
 
-      console.log(form)
+      const title = document.getElementById('task-name');
+      const descreption = document.getElementById('task-descreption');
+      const dueDate = document.getElementById('due-date-input');
+      const category = document.getElementById('category');
+      const saveBtn = document.getElementById('save-task-button');
+      const cancelBtn = document.getElementById('cancel-button');
+
       //hide the todo we want to edit
       element.style.display = 'none';
 
@@ -203,61 +260,51 @@ const todoController = (function() {
       category.value = todo.category;
 
       //style the save button
-      submitBtn.style.opacity = "1";
-      submitBtn.textContent = 'Save';
-      submitBtn.style.cursor = 'pointer';
+      saveBtn.style.opacity = "1";
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cursor = 'pointer';
 
-      //Bind events
-      cancelBtn.addEventListener('click', cancelEdit, {once:true});
-      submitBtn.addEventListener('click', submitEdit, {once:true});
+      //cancel button
+      cancelBtn.addEventListener('click', () => {
+        form.remove();
+        element.style.display = 'flex';
+      });
+
+      saveBtn.addEventListener('click', submitEdit);
 
       title.addEventListener('keyup', () => {
         if (title.value == null || title.value == '') {
-          submitBtn.style.opacity = '0.5';
-          submitBtn.style.cursor = 'not-allowed';
-          submitBtn.removeEventListener('click', editTodo);
+          saveBtn.style.opacity = '0.5';
+          saveBtn.style.cursor = 'not-allowed';
+          saveBtn.removeEventListener('click', submitEdit);
         }
         else {
-          submitBtn.style.opacity = "1";
-          submitBtn.style.cursor = 'pointer';
+          saveBtn.style.opacity = "1";
+          saveBtn.style.cursor = 'pointer';
           //if user has input data we create a new to-do
+          saveBtn.addEventListener('click', submitEdit);
         }
       });
-
-      //if the cancel button is clicked we remove and reset the form and remove the enevtListener
-      function cancelEdit() {
-        element.style.display = 'flex';
-
-        title.value = '';
-        descreption.value = '';
-        dueDate.value = '';
-        category.value = '';
-
-        submitBtn.style.opacity = "0.5";
-        submitBtn.style.cursor = 'not-allowed';
-
-        form.style.display = 'none';
-        cancelBtn.removeEventListener('click', cancelEdit);
-      }
 
       //edit todo
       function submitEdit() {
         events.emit('submitEdit', [todo.id, title.value, descreption.value, dueDate.value, category.value]);
-        title.value = '';
-        descreption.value = '';
-        dueDate.value = '';
-        category.value = '';
-
-        submitBtn.style.opacity = "0.5";
-        submitBtn.style.cursor = 'not-allowed';
-
-        submitBtn.removeEventListener('click', submitEdit)
+        form.remove()
       }
 
-      //submitBtn.addEventListener('click', editTodo);
-      newTodoInput.style.display = 'flex';
+      //add task buttons
+      addNewTaskBtn.addEventListener('click', () => {
+        addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+      }, {once:true});
+
+      document.getElementById('side-bar-add-new-task').addEventListener('click', () => {
+        //if we are in another screen and add new task is clicked we show the Upcoming screen
+        if(mainScreen.style.display == 'none') events.emit('showUpcomingScreen');
+
+        addNewTaskBtn.insertAdjacentElement('beforebegin', createForm('newTodo'));
+
+      }, {once:true});
     }
-    
   }
 
   function renderTodos(todos) {
@@ -330,10 +377,15 @@ const todoController = (function() {
   }
 
   //create input element helper function
-  function createInput(type, id) {
+  function createInput(type, id, placeholder) {
     const input = document.createElement('input');
     input.setAttribute('type', type);
     input.id = id;
+    if(type == 'text') {
+      input.setAttribute('placeholder', placeholder);
+    } else if (type == 'datetime-local') {
+      input.setAttribute('class', 'hover-effect');
+    }
 
     return input
   }
@@ -348,6 +400,9 @@ const todoController = (function() {
       case 'edit':
         iconEl.src = './icons/edit.svg';
         iconEl.setAttribute('class', 'edit-button hover-effect')
+        break;
+      case 'reminder':
+        iconEl.src = './icons/riminder.svg';
         break;
      }
 
@@ -366,7 +421,7 @@ const categoryController = (function() {
   //bind events
   events.on('showCategoriesScreen', showCategoriesScreen);
   addCategoryBtn.addEventListener('click', displayAddCategoryForm, {once:true});
-  events.on('renderCategories', renderCategories)
+  events.on('renderCategories', renderCategories);
 
   function showCategoriesScreen() {
     mainScreen.style.display = 'none';
@@ -378,7 +433,6 @@ const categoryController = (function() {
   function displayAddCategoryForm() {
     const addCategoryForm = document.createElement('div');
     addCategoryForm.setAttribute('class', 'new-category-input-container');
-    addCategoryForm.style.display = 'flex';
 
     const categoryNameInput = document.createElement('input');
     categoryNameInput.id = 'category-name-input';

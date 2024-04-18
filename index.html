@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <script src="main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <title>To-Do List</title>
 </head>
 <body>
@@ -34,7 +35,7 @@
           <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
           <div>Sort</div>
         </li>
-        <li class="sidebar-element hover-effect">
+        <li class="sidebar-element hover-effect" id="completed-sidebar-button">
           <img src="./icons/trash-bin.svg" alt="competed-tasks-icon" class="sidebar-icon">
           <div>Completed</div>
         </li>
@@ -86,11 +87,11 @@
       </div>
     </main>
 
-    <!--Sort Todos Screen-->
-    <main class="sort-screen" id="sort-screen">
-      <h2 class="page-title">Sort</h2>
+    <!--Completed Todos Screen-->
+    <main class="completed-screen" id="completed-screen">
+      <h2 class="page-title">Completed</h2>
 
-      <div class="container"></div>
+      <div class="completed-container" id="completed-container">No completed to-dos yet</div>
     </main>
   </div>
 </body>

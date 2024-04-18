@@ -26,7 +26,7 @@ let events = {
 };
 
 //styling and animations
-const styles = (function(){
+const styles = (function(){ 
   //sidebar transition
   let isSidebarOpen = true;
   function sidebarAnimation() {
@@ -41,23 +41,87 @@ const styles = (function(){
     }
   }
 
+  //create element in todos container helper function
+  function createTodoElement(el, content, className) {
+    const element = document.createElement(el);
+    element.textContent = content;
+    element.setAttribute('class', className);
+
+    return element
+  }
+
+
+  //create input element helper function
+  function createInput(type, id, placeholder) {
+    const input = document.createElement('input');
+    input.setAttribute('type', type);
+    input.id = id;
+    if(type == 'text') {
+      input.setAttribute('placeholder', placeholder);
+    } else if (type == 'datetime-local') {
+      input.setAttribute('class', 'hover-effect');
+    }
+
+    return input
+  }
+
+  //create icon helper function
+  function createIcon(icon) {
+    const iconEl = document.createElement('img');
+     switch (icon) {
+      case 'due-date':
+        iconEl.src = './icons/calendar.svg';
+        break;
+      case 'edit':
+        iconEl.src = './icons/edit.svg';
+        iconEl.setAttribute('class', 'edit-button hover-effect')
+        break;
+      case 'reminder':
+        iconEl.src = './icons/riminder.svg';
+        break;
+      case 'remove':
+        iconEl.src = './icons/remove-icon.svg';
+        iconEl.setAttribute('class', 'hover-effect');
+        break;
+     }
+
+     return iconEl
+  }
+
+  //create due-date button
+  function createDueDateBtn(todo, btn) {
+    let dueDate = new Date(todo.dueDate)
+    let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    let hours = dueDate.getHours();
+    let minutes = dueDate.getMinutes();
+    let formattedTime = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+  
+    btn.textContent = dueDate.getDate() + ' ' + months[dueDate.getMonth()] + ' ' + formattedTime;
+
+    btn.appendChild(createIcon('due-date'))
+  }
 
   return {
-    sidebarAnimation
+    sidebarAnimation:sidebarAnimation,
+    createTodoElement:createTodoElement,
+    createInput:createInput,
+    createIcon:createIcon,
+    createDueDateBtn:createDueDateBtn
   }
 })()
 
 const mainScreen = document.getElementById('main-screen');
 const categoriesScreen = document.getElementById('category-screen');
-const sortScreen = document.getElementById('sort-screen');
+const completedScreen = document.getElementById('completed-screen');
 
 const categoriesSidebarBtn = document.getElementById('categories-button');
 const upcomingSidebarBtn = document.getElementById('upcoming-button');
-const sortSidebarBtn = document.getElementById('sort-sidebar-button');
+const completedSidebarBtn = document.getElementById('completed-sidebar-button');
 
 upcomingSidebarBtn.addEventListener('click', () => events.emit('showUpcomingScreen'));
 categoriesSidebarBtn.addEventListener('click', () => events.emit('showCategoriesScreen'));
-sortSidebarBtn.addEventListener('click', () => events.emit('showSortScreen'));
+completedSidebarBtn.addEventListener('click', () => events.emit('showCompletedScreen'));
 
 //todo controller module
   //handle DOM
@@ -66,18 +130,8 @@ sortSidebarBtn.addEventListener('click', () => events.emit('showSortScreen'));
 const todoController = (function() {
   //cashe DOM
   const openSidebarBtn = document.getElementById('hide-sidebar-button');
-
   const toDoContainer = document.getElementById('to-do-container');
-  const newTodoInput = document.getElementById('new-todo-input-container');
-
-  const cancelBtn = document.getElementById('cancel-button');
-
   const addNewTaskBtn = document.getElementById('add-task-button');
-
-  //form
-  const descreption = document.getElementById('task-descreption');
-  const dueDate = document.getElementById('due-date-input');
-  const category = document.getElementById('category');
 
   //bind events
   openSidebarBtn.addEventListener('click', styles.sidebarAnimation);
@@ -104,7 +158,7 @@ const todoController = (function() {
 
   function showUpcomingScreen() {
     categoriesScreen.style.display = 'none';
-    sortScreen.style.display = 'none';
+    completedScreen.style.display = 'none';
 
     mainScreen.style.display = 'flex';
   }
@@ -116,42 +170,46 @@ const todoController = (function() {
     formContainer.setAttribute('class', 'new-todo-input-container');
     formContainer.id = 'new-todo-input-container';
 
-    const title = createInput('text', 'task-name', 'Task name')
+    const title = styles.createInput('text', 'task-name', 'Task name')
     formContainer.appendChild(title);
 
-    const descreption = createInput('text', 'task-descreption', 'Descreption')
+    const descreption = styles.createInput('text', 'task-descreption', 'Descreption')
     formContainer.appendChild(descreption);
 
     const btnContainer = document.createElement('div');
     btnContainer.setAttribute('class', 'button-container');
 
-    const dueDate = createInput('datetime-local', 'due-date-input')
+    const dueDate = styles.createInput('datetime-local', 'due-date-input')
     btnContainer.appendChild(dueDate);
 
     //Select Input
-    const selectInput = createTodoElement('select', '', 'hover-effect');
+    const selectInput = styles.createTodoElement('select', '', 'hover-effect');
     selectInput.id = 'category';
 
     const option = document.createElement('option');
     option.setAttribute('class', 'select-category');
-    option.setAttribute('value', 'default');
+    option.setAttribute('value', '');
     option.textContent = 'Select Category';
 
     selectInput.appendChild(option);
+    
+    //add saves categories to the select option
+    events.emit('getCategories', selectInput);
+
     btnContainer.appendChild(selectInput);
     
-    const reminderBtn = createTodoElement('button', 'Reminder', 'reminder-button hover-effect');
-    reminderBtn.appendChild(createIcon('reminder'));
+    const reminderBtn = styles.createTodoElement('button', 'Reminder', 'reminder-button hover-effect');
+    reminderBtn.appendChild(styles.createIcon('reminder'));
 
     btnContainer.appendChild(reminderBtn);
     formContainer.appendChild(btnContainer)
 
-    const saveCancelBtnContainer = createTodoElement('div', '', 'save-cancel-button-container');
-    const cancelBtn = createTodoElement('button', 'Cancel', 'cancel-button hover-effect');
+    const saveCancelBtnContainer = styles.createTodoElement('div', '', 'save-cancel-button-container');
+    const cancelBtn = styles.createTodoElement('button', 'Cancel', 'cancel-button hover-effect');
     cancelBtn.id = 'cancel-button';
     saveCancelBtnContainer.appendChild(cancelBtn)
 
-    const saveBtn = createTodoElement('button', 'Add', 'save-task-button');
+    const saveBtn = styles.createTodoElement('button', 'Add', 'save-task-button');
     saveBtn.id = 'save-task-button';
     saveCancelBtnContainer.appendChild(saveBtn);
     formContainer.appendChild(saveCancelBtnContainer);
@@ -185,14 +243,13 @@ const todoController = (function() {
         if (title.value == null || title.value == '') {
           saveBtn.style.opacity = '0.5';
           saveBtn.style.cursor = 'not-allowed';
-          //saveBtn.removeEventListener('click', addNewTodo);
         } else {
           saveBtn.style.opacity = "1";
           saveBtn.style.cursor = 'pointer';
           //if user has input data we create a new to-do
           saveBtn.addEventListener('click', addNewTodo);
         }
-      })
+      });
     }
 
     //add new todo function
@@ -206,7 +263,7 @@ const todoController = (function() {
 
     //if edit form is displayed we remove it and reset it
     if (document.getElementById('new-todo-input-container') != null) {
-      document.getElementById('new-todo-input-container').remove()
+      document.getElementById('new-todo-input-container').remove();
       events.emit('showTask');
     }
 
@@ -321,22 +378,28 @@ const todoController = (function() {
     const todoLeftSide = document.createElement('div');
     todoLeftSide.setAttribute('class', 'to-do-left-side');
     todoCard.appendChild(todoLeftSide);
-    todoLeftSide.appendChild(createInput('checkbox', 'isCompleted'))
+
+    const completedCheckbox = styles.createInput('checkbox', 'isCompleted');
+    completedCheckbox.addEventListener('click', () => {
+      confetti();
+      events.emit('completedTask', todo)
+    });
+    todoLeftSide.appendChild(completedCheckbox);
 
     //To-Do Right Side
     const todoRightSide = document.createElement('div');
     todoRightSide.setAttribute('class', 'to-do-right-side');
     todoCard.appendChild(todoRightSide);
-    todoRightSide.appendChild(createTodoElement('h3', todo.title, 'to-do-title'));
+    todoRightSide.appendChild(styles.createTodoElement('h3', todo.title, 'to-do-title'));
 
     //edit button
-    const editButton = todoRightSide.appendChild(createIcon('edit'));
-    editButton.id = todo.id
+    const editButton = todoRightSide.appendChild(styles.createIcon('edit'));
+    editButton.id = todo.id;
     
     //attach event lister for each edit button
     addEditEL(todo, todoCard);
     
-    todoRightSide.appendChild(createTodoElement('p', todo.descreption, 'to-do-description'));
+    todoRightSide.appendChild(styles.createTodoElement('p', todo.descreption, 'to-do-description'));
 
     //Right Side button container
     const btnContainer = document.createElement('div');
@@ -347,68 +410,18 @@ const todoController = (function() {
 
     //dueDate button
     if(todo.dueDate != '') {
-      const dueDateBtn = btnContainer.appendChild(createTodoElement('button', '', 'calendar-button hover-effect'));
-      let dueDate = new Date(todo.dueDate)
-      let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-      let hours = dueDate.getHours();
-      let minutes = dueDate.getMinutes();
-      let formattedTime = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-    
-      dueDateBtn.textContent = dueDate.getDate() + ' ' + months[dueDate.getMonth()] + ' ' + formattedTime;
-  
-      dueDateBtn.appendChild(createIcon('due-date'));
+      const dueDateBtn = btnContainer.appendChild(styles.createTodoElement('button', '', 'calendar-button hover-effect'));
+      styles.createDueDateBtn(todo, dueDateBtn);
     }
 
-    //category 
-    btnContainer.appendChild(createTodoElement('div', `Type: ${todo.category}`, 'to-do-category'))
+    //category
+    if(todo.category != '') {
+      btnContainer.appendChild(styles.createTodoElement('div', `Type: ${todo.category}`, 'to-do-category'))
+    }
 
     //insert Todo
     toDoContainer.insertAdjacentElement('afterbegin', todoCard);
   }
-
-  //create element in todos container helper function
-  function createTodoElement(el, content, className) {
-    const element = document.createElement(el);
-    element.textContent = content;
-    element.setAttribute('class', className);
-
-    return element
-  }
-
-  //create input element helper function
-  function createInput(type, id, placeholder) {
-    const input = document.createElement('input');
-    input.setAttribute('type', type);
-    input.id = id;
-    if(type == 'text') {
-      input.setAttribute('placeholder', placeholder);
-    } else if (type == 'datetime-local') {
-      input.setAttribute('class', 'hover-effect');
-    }
-
-    return input
-  }
-
-  //create icon helper function
-  function createIcon(icon) {
-    const iconEl = document.createElement('img');
-     switch (icon) {
-      case 'due-date':
-        iconEl.src = './icons/calendar.svg';
-        break;
-      case 'edit':
-        iconEl.src = './icons/edit.svg';
-        iconEl.setAttribute('class', 'edit-button hover-effect')
-        break;
-      case 'reminder':
-        iconEl.src = './icons/riminder.svg';
-        break;
-     }
-
-     return iconEl
-  }
-
 
 })();
 
@@ -425,7 +438,7 @@ const categoryController = (function() {
 
   function showCategoriesScreen() {
     mainScreen.style.display = 'none';
-    sortScreen.style.display = 'none';
+    completedScreen.style.display = 'none';
 
     categoriesScreen.style.display = 'flex';
   }
@@ -497,7 +510,6 @@ const categoryController = (function() {
   function displayCategory(category) {
     const categoryCard = document.createElement('div')
     categoryCard.setAttribute('class', 'category-card');
-    //categoryCard.id = category.id;
 
     const categoryName = document.createElement('div');
     categoryName.textContent = category.name;
@@ -512,29 +524,80 @@ const categoryController = (function() {
 
     //atach eventListener
     removeCategoryBtn.addEventListener('click', (event) => {
-      const deleteBtn = event.target
+      const deleteBtn = event.target;
       const idToDelete = deleteBtn.id;
 
       events.emit('deleteCategory', idToDelete);
-    })
+    });
 
     categoriesContainer.insertAdjacentElement('afterbegin', categoryCard);
   }
 
 })();
 
-const sortController = (function() {
+const completedController = (function() {
 
-  events.on('showSortScreen', showSortScreen)
-
-  function showSortScreen() {
+  function showCompletedScreen() {
     mainScreen.style.display = 'none';
     categoriesScreen.style.display = 'none';
-
-    sortScreen.style.display = 'flex';
+    
+    completedScreen.style.display = 'flex';
   }
-})()
 
+  //cashe DOM
+  const completedContainer = document.getElementById('completed-container');
+
+  //Bind events
+  events.on('showCompletedScreen', showCompletedScreen);
+  events.on('renderCompletedTodos', renderCompletedTodos);
+
+  function renderCompletedTodos(completedTodos) {
+    completedContainer.textContent = '';
+    completedTodos.forEach(completedTodo => displayCompletedTodos(completedTodo));
+  }
+
+  function displayCompletedTodos(completedTodo) {
+    const completedTodoCard = document.createElement('div');
+    completedTodoCard.setAttribute('class', 'completed-todo-card');
+
+    completedTodoCard.appendChild(styles.createTodoElement('h3', completedTodo.title, 'to-do-title'));
+
+    //remove button
+    const removeBtn = completedTodoCard.appendChild(styles.createIcon('remove'));
+    removeBtn.id = completedTodo.id;
+
+    //atach eventListener
+    removeBtn.addEventListener('click', (event) => {
+      const deleteBtn = event.target;
+      const idToDelete = deleteBtn.id;
+
+      events.emit('deleteCompletedTodo', idToDelete);
+    });
+
+    completedTodoCard.appendChild(styles.createTodoElement('p', completedTodo.descreption, 'to-do-description'));
+
+    const btnContainer = document.createElement('div');
+    btnContainer.setAttribute('class', 'button-container');
+    completedTodoCard.appendChild(btnContainer);
+
+    //create buttons
+
+    //dueDate button
+    if(completedTodo.dueDate != '') {
+      const dueDateBtn = btnContainer.appendChild(styles.createTodoElement('button', '', 'calendar-button hover-effect'));
+      styles.createDueDateBtn(completedTodo, dueDateBtn);
+    }
+
+    //category
+    if(completedTodo.category != '') {
+      btnContainer.appendChild(styles.createTodoElement('div', `Type: ${completedTodo.category}`, 'to-do-category'))
+    }
+
+    //insert Todo
+    completedContainer.insertAdjacentElement('afterbegin', completedTodoCard);
+
+  }
+})();
 
 
 //ToDos module
@@ -555,7 +618,8 @@ const toDosHandler = (function() {
 
   //bind events
   events.on('create ToDo', createToDo);
-  events.on('submitEdit', editTodo)
+  events.on('submitEdit', editTodo);
+  events.on('deleteTodo', deleteTodo);
   
   //create a new todo
   function createToDo(data) {
@@ -593,6 +657,16 @@ const toDosHandler = (function() {
     events.emit('renderTodos', todos);
   }
 
+  function deleteTodo(idToDelete) {
+    todos = todos.filter((todo) => {
+      if(todo.id == idToDelete) {
+        return false;
+      } else return true;
+    });
+
+    saveTodo();
+    events.emit('renderTodos', todos);
+  }
 
   //save todo in local storage
   function saveTodo() {
@@ -620,6 +694,16 @@ const categoriesHandler = (function() {
   //bind events
   events.on('createCategory', createCategory);
   events.on('deleteCategory', deleteCategory);
+  events.on('getCategories', (parent) => {
+    categories.forEach((category) => {
+      const option = document.createElement('option');
+      option.setAttribute('class', 'select-category');
+      option.setAttribute('value', category.name);
+      option.textContent = category.name;
+
+      parent.appendChild(option);
+    })
+  })
   events.emit('renderCategories', categories);
 
   function createCategory(category) {
@@ -645,5 +729,44 @@ const categoriesHandler = (function() {
 
   function saveCategory() {
     localStorage.setItem('categories', JSON.stringify(categories));
+  }
+})();
+
+const completedHAndler = (function() {
+  let completedTodos = [];
+
+  const savedcompletedTodos = JSON.parse(localStorage.getItem('completedTodos'));
+  if(Array.isArray(savedcompletedTodos)) {
+    completedTodos = savedcompletedTodos;
+  }
+
+  //bind events
+  events.on('completedTask', completedTask);
+  events.on('deleteCompletedTodo', deleteCompletedTodo)
+  events.emit('renderCompletedTodos', completedTodos);
+
+  function completedTask(completedTodo) {
+    completedTodos.push(completedTodo);
+
+    //remove To-do from Upcoming screen
+    events.emit('deleteTodo', completedTodo.id);
+    
+    saveCompleted();
+    events.emit('renderCompletedTodos', completedTodos);
+  }
+
+  function deleteCompletedTodo(idToDelete) {
+    completedTodos = completedTodos.filter((completedTodo) => {
+      if(completedTodo.id == idToDelete) {
+        return false;
+      } else return true;
+    });
+
+    saveCompleted();
+    events.emit('renderCompletedTodos', completedTodos);
+  }
+
+  function saveCompleted() {
+    localStorage.setItem('completedTodos', JSON.stringify(completedTodos));
   }
 })();

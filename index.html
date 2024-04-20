@@ -35,9 +35,9 @@
           <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
           <div>Sort</div>
         </li>
-        <li class="sidebar-element hover-effect" id="completed-sidebar-button">
-          <img src="./icons/trash-bin.svg" alt="competed-tasks-icon" class="sidebar-icon">
-          <div>Completed</div>
+        <li class="sidebar-element hover-effect sort" id="completed-sidebar-button">
+          <img src="./icons/trash-bin.svg" alt="competed-tasks-icon" class="sidebar-icon sort">
+          <div class="sort">Completed</div>
         </li>
       </ul>
     </nav>
@@ -55,22 +55,6 @@
       </div>
     </header>
 
-    <!--Main-->
-    <main class="main-screen" id="main-screen">
-      <!--Upcoming Screen-->
-      <h2 class="page-title">Upcoming</h2>
-
-      <div class="to-do-container" id="to-do-container">
-        <!--Dispalay todo cards-->
-      </div>
-
-      <!--Add new task button-->
-      <div class="add-new-to-do-container" id="add-task-button">
-        <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
-        <div>Add Task</div>
-      </div>
-    </main>
-
     <!--Categories Screen-->
     <main class="category-screen" id="category-screen">
       <h2 class="page-title">Categories</h2>
@@ -86,6 +70,57 @@
         <div>Add new category</div>
       </div>
     </main>
+
+    <!--Upcoming Screen-->
+    <main class="main-screen" id="main-screen">
+      <h2 class="page-title">Upcoming</h2>
+
+      <div class="to-do-container" id="to-do-container">
+        <!--Dispalay todo cards-->
+      </div>
+
+      <!--Add new task button-->
+      <div class="add-new-to-do-container" id="add-task-button">
+        <img src="./icons/plus-circle.svg" alt="add-task-icon" class="sidebar-icon">
+        <div>Add Task</div>
+      </div>
+    </main>
+
+    <!--Sort To-dos-->
+    <div class="sort-container" id="sort-container">
+      <div class="sort-header">
+        <div>Sort By</div>
+        <img src="./icons/sort.svg" alt="sort-icon" class="sidebar-icon">
+      </div>
+
+      <div class="hover-effect sort-option" data-type="manual" data-selected="true">
+        <div>Manual (default)</div>
+        <img src="./icons/check-icon.svg" alt="check-icon" style="display: inline-block;">
+      </div>
+      <div class="hover-effect sort-option" data-type="name" data-selected="false">
+        <div>Name</div>
+        <img src="./icons/check-icon.svg" alt="check-icon">
+      </div>
+      <div class="hover-effect sort-option" data-type="dueDate" data-selected="false">
+        <div>Due Date</div>
+        <img src="./icons/check-icon.svg" alt="check-icon">
+      </div>
+      <div class="hover-effect sort-option" data-type="category" data-selected="false">
+        <div>Category</div>
+        <img src="./icons/check-icon.svg" alt="check-icon">
+      </div>
+      <div class="hover-effect order-option" data-order="ascending" data-selected="true">
+        <div>Ascending (default)</div>
+        <img src="./icons/check-icon.svg" alt="check-icon" style="display: inline-block;">
+      </div>
+      <div class="hover-effect order-option" data-order="descending" data-selected="false">
+        <div>Descending</div>
+        <img src="./icons/check-icon.svg" alt="check-icon">
+      </div>
+      <button class="save-task-button" id="apply-button">
+        Apply
+      </button>
+    </div>
 
     <!--Completed Todos Screen-->
     <main class="completed-screen" id="completed-screen">
